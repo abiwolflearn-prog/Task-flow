@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TaskFlow</title>
-    <meta name="description" content="A minimalist, powerful To-Do application built with React and Tailwind CSS." />
+    <meta name="description" content="A minimalist, powerful To-Do application." />
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,36 +16,131 @@
             fontFamily: {
               sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
             },
-            colors: {
-              // Custom colors can be defined here if needed, keeping default palette for now
-            }
           },
         },
       }
     </script>
     
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <!-- Inter Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
-      }
+      body { font-family: 'Inter', sans-serif; }
+      /* Smooth transitions */
+      .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "lucide-react": "https://esm.sh/lucide-react@^0.559.0",
-    "react/": "https://esm.sh/react@^19.2.1/",
-    "react": "https://esm.sh/react@^19.2.1",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.1/"
-  }
-}
-</script>
 </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<body class="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 selection:bg-indigo-100 dark:selection:bg-indigo-900">
+    
+    <div class="container mx-auto max-w-2xl px-4 py-8 md:py-12">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-500/30">
+                    <i data-lucide="check-square" class="w-8 h-8 text-white"></i>
+                </div>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400">
+                    TaskFlow
+                </h1>
+            </div>
+            <button id="themeToggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-600 dark:text-slate-300">
+                <i id="themeIcon" data-lucide="moon" class="w-6 h-6"></i>
+            </button>
+        </header>
+
+        <!-- Task Form -->
+        <form id="taskForm" class="mb-8 p-1 rounded-2xl bg-white dark:bg-slate-800 shadow-xl transition-all duration-300 border border-slate-100 dark:border-slate-700">
+            <div class="flex flex-col sm:flex-row gap-2 p-2">
+                <div class="relative flex-grow">
+                    <input type="text" id="taskInput" placeholder="Add a new task..." 
+                        class="w-full bg-transparent p-3 outline-none text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500">
+                </div>
+                <div class="flex gap-2">
+                    <select id="categorySelect" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl px-4 py-2 outline-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-sm font-medium border-r-8 border-transparent">
+                        <option value="Personal">Personal</option>
+                        <option value="Work">Work</option>
+                        <option value="School">School</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <button type="submit" id="addBtn" disabled class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 rounded-xl transition-all duration-200 shadow-md shadow-indigo-500/30 flex items-center justify-center min-w-[50px]">
+                        <i data-lucide="plus" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Stats -->
+        <div class="mb-6 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 px-1">
+            <div class="flex gap-4">
+               <span><strong id="pendingCount">0</strong> Pending</span>
+               <span><strong id="completedCount">0</strong> Completed</span>
+            </div>
+            <div>Total: <span id="totalCount">0</span></div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="flex flex-col md:flex-row gap-4 mb-6 sticky top-4 z-10">
+            <!-- Search -->
+            <div class="relative flex-grow group">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="h-5 w-5 text-slate-400"></i>
+                </div>
+                <input type="text" id="searchInput" placeholder="Search tasks..." 
+                    class="block w-full pl-10 pr-3 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl leading-5 text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm">
+            </div>
+
+            <div class="flex gap-2 overflow-x-auto pb-2 md:pb-0">
+                <!-- Filter -->
+                <div class="relative min-w-[140px]">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="filter" class="h-4 w-4 text-slate-400"></i>
+                    </div>
+                    <select id="filterCategory" class="block w-full pl-10 pr-8 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer appearance-none shadow-sm text-sm font-medium">
+                        <option value="All">All</option>
+                        <option value="Personal">Personal</option>
+                        <option value="Work">Work</option>
+                        <option value="School">School</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Sort -->
+                <div class="relative min-w-[140px]">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="arrow-up-down" class="h-4 w-4 text-slate-400"></i>
+                    </div>
+                    <select id="sortOption" class="block w-full pl-10 pr-8 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer appearance-none shadow-sm text-sm font-medium">
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                        <option value="a-z">A-Z</option>
+                        <option value="z-a">Z-A</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task List -->
+        <div id="taskList" class="space-y-1 min-h-[300px]">
+            <!-- Items injected via JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden flex-col items-center justify-center py-12 text-slate-400 dark:text-slate-600 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
+            <i data-lucide="layers" class="w-12 h-12 mb-3 opacity-50"></i>
+            <p class="text-lg font-medium">No tasks found</p>
+            <p class="text-sm opacity-75">Get started by adding a task!</p>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
 </html>
