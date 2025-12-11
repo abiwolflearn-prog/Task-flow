@@ -1,0 +1,5 @@
+{
+  "name": "TaskFlow",
+  "description": "A modern, responsive, and minimalist To-Do List application with task management, categorization, sorting, and dark mode.",
+  "requestFramePermissions": []
+}
