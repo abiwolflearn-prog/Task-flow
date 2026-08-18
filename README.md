@@ -18,3 +18,6 @@ View your app in AI Studio: https://ai.studio/apps/drive/1lKx6OPy76nc5TE0i0u-NbA
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+## Development
+
+This change was created to practice the GitHub Pull Request workflow.
